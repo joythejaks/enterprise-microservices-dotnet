@@ -1,0 +1,51 @@
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+        SA_PASSWORD: "YourStrong!Passw0rd"
+        ACCEPT_EULA: "Y"
+    ports:
+    - "1433:1433"
+    volumes:
+    - sqlserver-data:/var/opt/mssql
+    healthcheck:
+        test: ["CMD-SHELL", "exit 0"]
+        interval: 10s
+        retries: 10
+
+  authservice:
+    build:
+      context: ./src/AuthService
+    container_name: authservice
+    depends_on:
+      - sqlserver
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5001:8080"
+
+  attendanceservice:
+    build:
+      context: ./src/AttendanceService
+    container_name: attendanceservice
+    depends_on:
+      - sqlserver
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5002:8080"
+
+  apigateway:
+    build:
+      context: ./src/ApiGateway
+    container_name: apigateway
+    depends_on:
+      - authservice
+      - attendanceservice
+    ports:
+      - "5000:8080"
+
+volumes:
+  sqlserver-data:
