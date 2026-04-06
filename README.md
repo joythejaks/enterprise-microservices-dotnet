@@ -152,4 +152,4 @@ docker compose up --build
 # 👨‍💻 Author
 
 Jordi Setiawan\
-Backend Engineer \
+Full Stack Developer
